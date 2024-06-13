@@ -6,14 +6,12 @@ using Photon.Pun;
 public class PlayerController : MonoBehaviourPunCallbacks
 {
     public float moveSpeed;
-    public float speedX;
-    public float speedY;
     public Rigidbody2D rb;
     public Animator animator;
 
     private PhotonView view;
     private SpriteRenderer spriteRenderer;
-    public bool IsIdle;
+    private Vector2 lastSentVelocity; // Lưu trữ velocity gửi lần cuối
 
     void Start()
     {
@@ -22,39 +20,43 @@ public class PlayerController : MonoBehaviourPunCallbacks
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (view.IsMine)
         {
-            speedX = Input.GetAxisRaw("Horizontal") * moveSpeed;
-            speedY = Input.GetAxisRaw("Vertical") * moveSpeed;
-            rb.velocity = new Vector2(speedX, speedY);
+            float speedX = Input.GetAxisRaw("Horizontal");
+            float speedY = Input.GetAxisRaw("Vertical");
 
-            if (speedX == 0 && speedY == 0)
+            Vector2 velocity = new Vector2(speedX, speedY).normalized * moveSpeed;
+            rb.velocity = velocity;
+
+            // Kiểm tra nếu velocity đã thay đổi từ lần gửi trước đó
+            if (velocity != lastSentVelocity)
             {
-                // Idle
-                IsIdle = true;
-                animator.SetBool("IsMoving", false);
+                photonView.RPC("SyncMovement", RpcTarget.Others, velocity);
+                lastSentVelocity = velocity;
             }
-            else
-            {
-                // Moving
-                IsIdle = false;
-                animator.SetFloat("MoveX", speedX);
-                animator.SetFloat("MoveY", speedY);
-                animator.SetBool("IsMoving", true);
 
-                // Flip the character
-                if (speedX < 0)
-                {
-                    photonView.RPC("FlipCharacter", RpcTarget.All, false);
-                }
-                else if (speedX > 0)
-                {
-                    photonView.RPC("FlipCharacter", RpcTarget.All, true);
-                }
+            // Xử lý animation
+            animator.SetFloat("MoveX", velocity.x);
+            animator.SetFloat("MoveY", velocity.y);
+            animator.SetBool("IsMoving", velocity.magnitude > 0);
+
+            // Flip character
+            if (velocity.x != 0)
+            {
+                photonView.RPC("FlipCharacter", RpcTarget.All, velocity.x > 0);
             }
         }
+    }
+
+    [PunRPC]
+    void SyncMovement(Vector2 velocity)
+    {
+        rb.velocity = velocity;
+        animator.SetFloat("MoveX", velocity.x);
+        animator.SetFloat("MoveY", velocity.y);
+        animator.SetBool("IsMoving", velocity.magnitude > 0);
     }
 
     [PunRPC]
