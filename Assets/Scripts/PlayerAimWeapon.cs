@@ -5,12 +5,15 @@ using UnityEngine;
 public class PlayerAimWeapon : MonoBehaviour
 {
     private Transform aimTransform;
-    // private Animator aimAnimator;
+    private Animator aimAnimator;
+    private Animator aimChildAnimator;
 
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
-        // aimAnimator = aimTransform.GetComponent<Animator>();
+        aimAnimator = aimTransform.GetComponent<Animator>();
+
+        aimChildAnimator = aimTransform.GetComponentInChildren<Animator>();
     }
 
     private void Update()
@@ -42,9 +45,10 @@ public class PlayerAimWeapon : MonoBehaviour
 
     private void HandleShooting()
     {
-        if(Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0))
         {
-          //  aimAnimator.SetTrigger("Shoot");
+            aimChildAnimator.SetTrigger("Shoot");
         }
     }
+
 }
