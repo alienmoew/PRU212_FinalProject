@@ -11,6 +11,15 @@ public class PlayerAimWeapon : MonoBehaviour
     private PhotonView view;
     private float aimAngle;
     private Vector3 aimlocalScale;
+    private Vector3 aimDirection;
+
+    //Bullet
+    public GameObject bullet;
+    public Transform firePos;
+    public float TimeBtwFire = 0.2f;
+    public float bulletForce;
+
+    private float timeBtwFire;
 
     private void Awake()
     {
@@ -40,7 +49,8 @@ public class PlayerAimWeapon : MonoBehaviour
     {
         Vector3 mousePosition = MouseUtils.GetMouseWorldPosition2D();
 
-        Vector3 aimDirection = (mousePosition - transform.position).normalized;
+        Vector3 direction = (mousePosition - transform.position);
+        aimDirection = direction.normalized; 
         aimAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         aimTransform.eulerAngles = new Vector3(0, 0, aimAngle);
 
@@ -60,11 +70,12 @@ public class PlayerAimWeapon : MonoBehaviour
 
     private void HandleShooting()
     {
-        if (Input.GetMouseButtonDown(0))
+        timeBtwFire -= Time.deltaTime;
+        if (Input.GetMouseButtonDown(0) && timeBtwFire < 0)
         {
-            Vector3 mousePosition = MouseUtils.GetMouseWorldPosition2D();
             aimChildAnimator.SetTrigger("Shoot");
             view.RPC("PlayShootAnimation", RpcTarget.Others);
+            FireBullet();
         }
     }
 
@@ -86,5 +97,15 @@ public class PlayerAimWeapon : MonoBehaviour
     {
         aimTransform.eulerAngles = new Vector3(0, 0, aimAngle);
         aimTransform.localScale = aimlocalScale;
+    }
+
+    private void FireBullet()
+    {
+        timeBtwFire = TimeBtwFire;
+
+        GameObject bulletTmp = PhotonNetwork.Instantiate(bullet.name, firePos.position, Quaternion.Euler(0, 0, aimAngle));
+
+        Bullet bulletScript = bulletTmp.GetComponent<Bullet>();
+        bulletScript.bulletForce = bulletForce;
     }
 }
