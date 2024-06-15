@@ -1,25 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 
 public class PlayerAimWeapon : MonoBehaviour
 {
     private Transform aimTransform;
-    private Animator aimAnimator;
     private Animator aimChildAnimator;
 
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
-        aimAnimator = aimTransform.GetComponent<Animator>();
-
         aimChildAnimator = aimTransform.GetComponentInChildren<Animator>();
     }
 
     private void Update()
     {
-        HandleAiming();
-        HandleShooting();
+            HandleAiming();
+            HandleShooting();
     }
 
 
@@ -47,6 +46,7 @@ public class PlayerAimWeapon : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
+            Vector3 mousePosition = MouseUtils.GetMouseWorldPosition2D();
             aimChildAnimator.SetTrigger("Shoot");
         }
     }
