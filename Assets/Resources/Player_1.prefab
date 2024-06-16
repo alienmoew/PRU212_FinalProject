@@ -100,9 +100,10 @@ GameObject:
   - component: {fileID: 759633634173353635}
   - component: {fileID: 8749403636916750749}
   - component: {fileID: 8052516094094703341}
+  - component: {fileID: -8789010995405962920}
   - component: {fileID: 8903824351504212679}
-  - component: {fileID: 1469337191546574041}
   - component: {fileID: 6235340928067815245}
+  - component: {fileID: 1469337191546574041}
   - component: {fileID: 6210546399282658467}
   m_Layer: 3
   m_Name: Player_1
@@ -292,6 +293,22 @@ MonoBehaviour:
   moveSpeed: 5
   rb: {fileID: 759633634173353635}
   animator: {fileID: 6297324866474435131}
+--- !u!114 &-8789010995405962920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910398642904028467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a70fc60f6ca6fed4fa6040640d5763fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bullet: {fileID: 6339099786721370027, guid: 615e907760b3b5543838572078071776, type: 3}
+  firePos: {fileID: 5101047093329205965}
+  TimeBtwFire: 0.2
+  bulletForce: 20
 --- !u!114 &8903824351504212679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,12 +328,39 @@ MonoBehaviour:
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
-  - {fileID: 1469337191546574041}
   - {fileID: 6235340928067815245}
+  - {fileID: 1469337191546574041}
   - {fileID: 6210546399282658467}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
+--- !u!114 &6235340928067815245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1910398642904028467}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 1
+    SynchronizeType: 2
+    Name: MoveX
+  - Type: 4
+    SynchronizeType: 1
+    Name: IsMoving
+  - Type: 1
+    SynchronizeType: 2
+    Name: MoveY
+  m_SynchronizeLayers:
+  - SynchronizeType: 0
+    LayerIndex: 0
 --- !u!114 &1469337191546574041
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -350,33 +394,6 @@ MonoBehaviour:
     InterpolateOption: 0
     InterpolateMoveTowardsSpeed: 1
     InterpolateLerpSpeed: 0
---- !u!114 &6235340928067815245
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1910398642904028467}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ShowLayerWeightsInspector: 1
-  ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 1
-    SynchronizeType: 2
-    Name: MoveX
-  - Type: 4
-    SynchronizeType: 1
-    Name: IsMoving
-  - Type: 1
-    SynchronizeType: 2
-    Name: MoveY
-  m_SynchronizeLayers:
-  - SynchronizeType: 0
-    LayerIndex: 0
 --- !u!114 &6210546399282658467
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -542,7 +559,39 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1836638541773022409}
+  - {fileID: 5101047093329205965}
   m_Father: {fileID: 4611245696070067677}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &8058829785125404778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5101047093329205965}
+  m_Layer: 3
+  m_Name: FirePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5101047093329205965
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8058829785125404778}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.5400002, y: -0.33000004, z: 0}
+  m_LocalScale: {x: -1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7048877220994286934}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &9025915991199979464
 GameObject:
