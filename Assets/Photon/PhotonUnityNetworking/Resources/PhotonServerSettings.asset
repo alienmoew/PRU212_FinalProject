@@ -43,6 +43,8 @@ MonoBehaviour:
   - SyncMovement
   - PlayShootAnimation
   - SyncAiming
+  - PlayerDied
+  - RespawnPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0
