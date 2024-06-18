@@ -1,43 +1,75 @@
-using Photon.Pun.Demo.PunBasics;
-using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class EnemyFollow : MonoBehaviour
 {
-    public float speed;
-    public float stoppingDistance;
-    public float retreatDistance;
-    public float avoidanceRadius = 1.0f;  // Radius within which enemies will avoid each other
-    public float avoidanceStrength = 0.5f;  // How strong the avoidance force should be
-    public Transform[] patrolPoints;  // Array of patrol points
-    private int currentPatrolIndex = 0;
+    public float speed = 5f;
+    public float stoppingDistance = 1f;
+    public float avoidanceRadius = 1.0f;
+    public float avoidanceStrength = 0.5f;
+    public float patrolSpeed = 2f;
+    public float startWaitTime = 3f;
+    public List<Transform> moveSpots;
 
-    private Transform player;
+    private GameObject player;
+    private bool isFollowingPlayer;
+    private int currentSpotIndex;
+    private float waitTime;
 
-    void Start()
+    public float followDistance = 10f;
+    public float returnDistance = 15f;
+
+
+    private void Start()
     {
-        FindNearestPlayer();
+        waitTime = startWaitTime;
+        currentSpotIndex = 0;
+        player = GameObject.FindGameObjectWithTag("Player");
     }
 
-    void Update()
+    private void Update()
     {
-        FindNearestPlayer();
+        if (player != null && player.CompareTag("Player"))
+        {
+            float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
 
-        if (player == null)
+            if (distanceToPlayer <= followDistance)
+            {
+                isFollowingPlayer = true;
+            }
+            else if (distanceToPlayer > returnDistance)
+            {
+                isFollowingPlayer = false;
+            }
+        }
+        else
+        {
+            isFollowingPlayer = false;
+        }
+
+        if (isFollowingPlayer)
+        {
+            FollowPlayer();
+        }
+        else
         {
             Patrol();
+        }
+    }
+
+    private void FollowPlayer()
+    {
+        if (player == null)
+        {
+            isFollowingPlayer = false;
             return;
         }
 
-        Vector2 targetPosition = player.position;
+        Vector2 targetPosition = player.transform.position;
         Vector2 currentPosition = transform.position;
-
-        // Calculate the direction towards the player
         Vector2 direction = targetPosition - currentPosition;
         float distanceToPlayer = direction.magnitude;
 
-        // Apply avoidance from other enemies
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, avoidanceRadius);
         Vector2 avoidanceForce = Vector2.zero;
 
@@ -51,64 +83,59 @@ public class EnemyFollow : MonoBehaviour
         }
 
         Vector2 moveDirection = direction.normalized;
+        float currentSpeed = speed;
 
         if (distanceToPlayer > stoppingDistance)
         {
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + moveDirection + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + moveDirection + avoidanceForce * avoidanceStrength, currentSpeed * Time.deltaTime);
         }
-        else if (distanceToPlayer < stoppingDistance && distanceToPlayer > retreatDistance)
+        else
         {
-            // Enemy stays in place, apply only avoidance force
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + avoidanceForce * avoidanceStrength, currentSpeed * Time.deltaTime);
         }
-        else if (distanceToPlayer < retreatDistance)
-        {
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition - moveDirection + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
-        }
+
+        FlipIfNeeded(moveDirection);
     }
 
-    void Patrol()
+    private void Patrol()
     {
-        if (patrolPoints.Length == 0) return;
-
-        Transform patrolTarget = patrolPoints[currentPatrolIndex];
-        Vector2 currentPosition = transform.position;
-        Vector2 targetPosition = patrolTarget.position;
-
-        // Move towards the patrol point
-        transform.position = Vector2.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
-
-        // Check if the enemy reached the patrol point
-        if (Vector2.Distance(currentPosition, targetPosition) < 0.1f)
+        if (moveSpots.Count == 0)
         {
-            // Move to the next patrol point
-            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+            return;
         }
-    }
 
-    void FindNearestPlayer()
-    {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        float nearestDistance = Mathf.Infinity;
-        Transform nearestPlayer = null;
+        Transform targetSpot = moveSpots[currentSpotIndex];
 
-        foreach (GameObject playerObject in players)
+        if (Vector2.Distance(transform.position, targetSpot.position) < 0.2f)
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, playerObject.transform.position);
-            if (distanceToPlayer < nearestDistance)
+            if (waitTime <= 0)
             {
-                nearestDistance = distanceToPlayer;
-                nearestPlayer = playerObject.transform;
+                currentSpotIndex = (currentSpotIndex + 1) % moveSpots.Count;
+                waitTime = startWaitTime;
+            }
+            else
+            {
+                waitTime -= Time.deltaTime;
             }
         }
+        else
+        {
+            float currentSpeed = patrolSpeed;
+            transform.position = Vector2.MoveTowards(transform.position, targetSpot.position, currentSpeed * Time.deltaTime);
+        }
 
-        player = nearestPlayer;
+        FlipIfNeeded(targetSpot.position - transform.position);
     }
 
-    void OnDrawGizmosSelected()
+    private void FlipIfNeeded(Vector2 moveDirection)
     {
-        // Draw the avoidance radius in the editor for visualization
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, avoidanceRadius);
+        if (moveDirection.x > 0 && transform.localScale.x > 0)
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if (moveDirection.x < 0 && transform.localScale.x < 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
     }
 }
