@@ -10,7 +10,6 @@ public class GameHandle : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        // Lắng nghe sự kiện OnPlayerSpawned của Photon để cập nhật playerTransform
         StartCoroutine(FindPlayerTransform());
     }
 
@@ -35,15 +34,15 @@ public class GameHandle : MonoBehaviourPunCallbacks
         {
             Vector3 playerPosition = playerTransform.position;
 
-            // Lấy vị trí của con trỏ chuột trong không gian thế giới
             Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             mouseWorldPosition.z = playerPosition.z;
 
-            // Tính toán vị trí trung bình giữa người chơi và con trỏ chuột
             Vector3 targetPosition = playerPosition + (mouseWorldPosition - playerPosition) / 4f;
 
             return targetPosition;
         }
         return Vector3.zero;
     }
+
+
 }

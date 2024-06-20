@@ -6,22 +6,26 @@ using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
-    public float moveSpeed = 5f; // Tốc độ di chuyển của người chơi
-    public int maxHealth = 100;  // Máu tối đa của người chơi
+    public float moveSpeed = 5f;
     public Rigidbody2D rb;
     public Animator animator;
 
     private PhotonView view;
     private SpriteRenderer spriteRenderer;
     private Vector2 lastSentVelocity;
-    public int health; // Biến lưu trữ máu hiện tại
+
+    public HealthBar healthBar;
+    public HealthSystem healthSystem;
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         view = GetComponent<PhotonView>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        health = maxHealth; // Khởi tạo máu ban đầu
+        PhotonNetwork.OfflineMode = true;
+
+        healthSystem = new HealthSystem(100);
+        healthBar.Setup(healthSystem);
     }
 
     void FixedUpdate()
@@ -51,40 +55,6 @@ public class PlayerController : MonoBehaviourPunCallbacks
                 photonView.RPC("FlipCharacter", RpcTarget.All, velocity.x > 0);
             }
         }
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!view.IsMine) return; // Chỉ xử lý trên máy chủ của người chơi
-
-        if (other.CompareTag("Enemy"))
-        {
-            Debug.Log("Player entered Enemy trigger zone.");
-            TakeDamage(10); // Giảm 10 máu khi đi vào vùng kích hoạt của Enemy
-        }
-    }
-
-
-    void TakeDamage(int damage)
-    {
-        health -= damage;
-
-        if (health <= 0)
-        {
-            Die();
-        }
-    }
-
-    void Die()
-    {
-        // Gửi RPC để thông báo người chơi đã chết
-        photonView.RPC("PlayerDied", RpcTarget.All);
-    }
-
-    [PunRPC]
-    void PlayerDied()
-    {
-
     }
 
     [PunRPC]
