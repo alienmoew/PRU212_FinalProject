@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
 public class PlayerController : MonoBehaviourPunCallbacks
 {
@@ -19,13 +20,29 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     void Start()
     {
+        // PhotonNetwork.OfflineMode = true;
+
         rb = GetComponent<Rigidbody2D>();
         view = GetComponent<PhotonView>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        PhotonNetwork.OfflineMode = true;
 
         healthSystem = new HealthSystem(100);
         healthBar.Setup(healthSystem);
+    }
+
+    void Update()
+    {
+        if (view.IsMine)
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                healthSystem.Damage(10);
+            }
+            if (Input.GetMouseButtonDown(2))
+            {
+                healthSystem.Heal(10);
+            }
+        }
     }
 
     void FixedUpdate()
@@ -71,4 +88,5 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         spriteRenderer.flipX = flipX;
     }
+
 }

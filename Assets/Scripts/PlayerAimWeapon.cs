@@ -71,7 +71,7 @@ public class PlayerAimWeapon : MonoBehaviour
     private void HandleShooting()
     {
         timeBtwFire -= Time.deltaTime;
-        if (Input.GetMouseButtonDown(0) && timeBtwFire < 0)
+        if (Input.GetMouseButton(0) && timeBtwFire < 0)
         {
             aimChildAnimator.SetTrigger("Shoot");
             view.RPC("PlayShootAnimation", RpcTarget.Others);

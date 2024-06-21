@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3949076353635951707}
   - component: {fileID: 7773907110409789083}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Gun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96,7 +96,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2944216154746975579}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Aim
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -130,7 +130,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1836828288009340682}
   - component: {fileID: 2267626810752885436}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -225,7 +225,8 @@ GameObject:
   - component: {fileID: 528121941560796453}
   - component: {fileID: 5044676856982588462}
   - component: {fileID: 4671026466725691482}
-  m_Layer: 3
+  - component: {fileID: 6177938229902238736}
+  m_Layer: 6
   m_Name: Player_0
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -415,8 +416,7 @@ MonoBehaviour:
   rb: {fileID: 2387405741074180647}
   animator: {fileID: 521275148840643828}
   healthBar: {fileID: 3003316447923939739}
-  dame: 0
-  heal: 0
+  healthSystem: {fileID: 6177938229902238736}
 --- !u!114 &6986191784586844767
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -492,7 +492,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5974136953561561032}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8efc6b1d64977384eb3405357896c656, type: 3}
   m_Name: 
@@ -525,7 +525,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5974136953561561032}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0e7cb724808c322458aa4d15f5035fa9, type: 3}
   m_Name: 
@@ -534,6 +534,18 @@ MonoBehaviour:
   m_SynchronizeAngularVelocity: 0
   m_TeleportEnabled: 0
   m_TeleportIfDistanceGreaterThan: 3
+--- !u!114 &6177938229902238736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5974136953561561032}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa24a5159665bf046930e1b0956611d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6249885800399715977
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,7 +555,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5381776785521864197}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: FirePos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -576,7 +588,7 @@ GameObject:
   - component: {fileID: 3872204404357986889}
   - component: {fileID: 5243150797275573598}
   - component: {fileID: 3796089309433788531}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: MuzzeFlash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -683,7 +695,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4382580018841793954}
-  m_Layer: 3
+  m_Layer: 6
   m_Name: Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -714,9 +726,25 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1664086880515450369}
     m_Modifications:
+    - target: {fileID: 1065743225566564, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1440491198422750, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 1473727354331688, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
       propertyPath: m_Name
       value: pfHealthBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 1473727354331688, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1573002466582326, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 4090514546342678, guid: fa2764852a538774ab282cf9a5922a07, type: 3}
       propertyPath: m_LocalScale.x

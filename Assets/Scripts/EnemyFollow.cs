@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Photon.Pun;
 
-public class EnemyFollow : MonoBehaviour
+public class EnemyFollow : MonoBehaviourPunCallbacks
 {
     public float speed = 5f;
     public float stoppingDistance = 1f;
@@ -10,28 +11,38 @@ public class EnemyFollow : MonoBehaviour
     public float patrolSpeed = 2f;
     public float startWaitTime = 3f;
     public List<Transform> moveSpots;
-
-    private GameObject player;
-    private bool isFollowingPlayer;
-    private int currentSpotIndex;
-    private float waitTime;
-
     public float followDistance = 10f;
     public float returnDistance = 15f;
 
+    public int maxHealth = 100; // Maximum health
+
+    private GameObject currentTarget;
+    private bool isFollowingPlayer;
+    private int currentSpotIndex;
+    private float waitTime;
+    private HealthSystem healthSystem;
 
     private void Start()
     {
         waitTime = startWaitTime;
         currentSpotIndex = 0;
-        player = GameObject.FindGameObjectWithTag("Player");
+        healthSystem = new HealthSystem(maxHealth); // Initialize health system
+
+        // Set up health bar
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
+        if (healthBar != null)
+        {
+            healthBar.Setup(healthSystem);
+        }
     }
 
     private void Update()
     {
-        if (player != null && player.CompareTag("Player"))
+        FindClosestPlayer();
+
+        if (currentTarget != null)
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, player.transform.position);
+            float distanceToPlayer = Vector2.Distance(transform.position, currentTarget.transform.position);
 
             if (distanceToPlayer <= followDistance)
             {
@@ -57,15 +68,37 @@ public class EnemyFollow : MonoBehaviour
         }
     }
 
+    private void FindClosestPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        float minDistance = followDistance;
+        GameObject closestPlayer = null;
+
+        foreach (GameObject player in players)
+        {
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestPlayer = player;
+            }
+        }
+
+        if (closestPlayer != null)
+        {
+            currentTarget = closestPlayer;
+        }
+    }
+
     private void FollowPlayer()
     {
-        if (player == null)
+        if (currentTarget == null)
         {
             isFollowingPlayer = false;
             return;
         }
 
-        Vector2 targetPosition = player.transform.position;
+        Vector2 targetPosition = currentTarget.transform.position;
         Vector2 currentPosition = transform.position;
         Vector2 direction = targetPosition - currentPosition;
         float distanceToPlayer = direction.magnitude;
@@ -136,6 +169,42 @@ public class EnemyFollow : MonoBehaviour
         else if (moveDirection.x < 0 && transform.localScale.x < 0)
         {
             transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+    }
+
+    // Method to handle taking damage
+    public void TakeDamage(int damage)
+    {
+        photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    public void RPC_TakeDamage(int damage)
+    {
+        healthSystem.Damage(damage);
+
+        if (healthSystem.GetHealth() <= 0)
+        {
+            Die();
+        }
+    }
+
+    // Method to handle enemy death
+    private void Die()
+    {
+        if (photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
+    // Handle collisions with bullets
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            TakeDamage(10); // Adjust damage value as needed
+            Destroy(other.gameObject); // Destroy the bullet on impact
         }
     }
 }

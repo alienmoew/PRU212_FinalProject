@@ -1,6 +1,7 @@
 using System;
+using Photon.Pun;
 
-public class HealthSystem
+public class HealthSystem : MonoBehaviourPunCallbacks
 {
     public event EventHandler OnHealthChanged;
     private int health;
@@ -12,23 +13,26 @@ public class HealthSystem
         health = healthMax;
     }
 
-    public int GetHealth() {  return health; }
+    public int GetHealth() { return health; }
 
     public float GetHealthPercent()
     {
-        return (float) health / healthMax;
+        return (float)health / healthMax;
     }
 
-    public void Damage(int damageAmmout)
+    [PunRPC]
+    public void Damage(int damageAmount)
     {
-        health -= damageAmmout;
-        if (health < 0)  health = 0; 
-        if (OnHealthChanged != null) OnHealthChanged(this, EventArgs.Empty);
+        health -= damageAmount;
+        if (health < 0) health = 0;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    public void Heal (int healAmmout) {
-        health += healAmmout; 
-        if(health > healthMax) health = healthMax;
-        if (OnHealthChanged != null) OnHealthChanged(this, EventArgs.Empty);
+    [PunRPC]
+    public void Heal(int healAmount)
+    {
+        health += healAmount;
+        if (health > healthMax) health = healthMax;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
     }
 }
