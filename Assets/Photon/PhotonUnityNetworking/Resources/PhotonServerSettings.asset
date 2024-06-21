@@ -45,6 +45,12 @@ MonoBehaviour:
   - SyncAiming
   - PlayerDied
   - RespawnPlayer
+  - SyncHealth
+  - Damage
+  - Heal
+  - RPC_TakeDamage
+  - PlayShootAnimationRifle
+  - SyncWeaponChange
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 0

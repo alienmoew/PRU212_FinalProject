@@ -21,11 +21,15 @@ public class Bullet : MonoBehaviourPun, IPunObservable
         }
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
         if (photonView.IsMine)
         {
-            PhotonNetwork.Destroy(gameObject);
+            if (collision.gameObject.CompareTag("Enemy"))
+            {
+                // You could handle damage logic here if needed
+                PhotonNetwork.Destroy(gameObject);
+            }
         }
     }
 
