@@ -93293,7 +93293,7 @@ Transform:
   m_GameObject: {fileID: 936895046}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.12, y: 0.82, z: 0.22071947}
+  m_LocalPosition: {x: -2.75, y: -4.29, z: 0.22071947}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -98734,7 +98734,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerPrefabs:
-  - {fileID: 5974136953561561032, guid: df61940914354fc41b55fba7c9bf0677, type: 3}
+  - {fileID: 5686251878950355749, guid: 69ff07c70952e724dbea25788028b4b4, type: 3}
   - {fileID: 1910398642904028467, guid: 96b5074ae7d57bf4d94d53719f4e5d79, type: 3}
   - {fileID: 1910398642904028467, guid: 917ab7686c0a7ef4ab14e78430fd615b, type: 3}
   spawnPoints:

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
-public class PlayerAimWeapon : MonoBehaviour
+public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 {
     private Transform aimTransform;
     private Animator aimChildAnimator;
@@ -15,15 +15,40 @@ public class PlayerAimWeapon : MonoBehaviour
 
     //Bullet
     public GameObject bullet;
-    public Transform firePos;
-    public float TimeBtwFire = 0.2f;
+    public Transform[][] firePos;
+
+    public float TimeBtwFire = 0.5f;
     public float bulletForce;
 
     private float timeBtwFire;
 
+    private GameObject gunObject;
+    private GameObject rifleObject;
+
+    public float TimeBtwFireGun;
+    public float TimeBtwFireRifle;
+
+    private float timeBtwFireGun;
+    private float timeBtwFireRifle;
+
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
+
+        gunObject = aimTransform.Find("Visual/Gun").gameObject;
+        rifleObject = aimTransform.Find("Visual/Rifle").gameObject;
+
+        firePos = new Transform[2][];
+
+        firePos[0] = new Transform[3]; // Súng bắn từ 3 vị trí
+        firePos[0][0] = transform.Find("Aim/Visual/Gun/FirePos1");
+        firePos[0][1] = transform.Find("Aim/Visual/Gun/FirePos2");
+        firePos[0][2] = transform.Find("Aim/Visual/Gun/FirePos3");
+
+        // Khởi tạo vị trí bắn cho Rifle
+        firePos[1] = new Transform[1]; // Súng trường bắn từ 1 vị trí
+        firePos[1][0] = transform.Find("Aim/Visual/Rifle/FirePos");
+
         aimChildAnimator = aimTransform.GetComponentInChildren<Animator>();
     }
 
@@ -38,6 +63,20 @@ public class PlayerAimWeapon : MonoBehaviour
         {
             HandleAiming();
             HandleShooting();
+
+            // Xử lý chuyển đổi súng và súng trường
+            if (Input.GetKeyDown(KeyCode.Alpha1))
+            {
+                SetGunActive(true);
+                SetRifleActive(false);
+                view.RPC("SyncWeaponChange", RpcTarget.Others, true, false); // Gửi RPC khi chuyển sang súng
+            }
+            else if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                SetGunActive(false);
+                SetRifleActive(true);
+                view.RPC("SyncWeaponChange", RpcTarget.Others, false, true); // Gửi RPC khi chuyển sang súng trường
+            }
         }
         else
         {
@@ -45,12 +84,22 @@ public class PlayerAimWeapon : MonoBehaviour
         }
     }
 
+    private void SetGunActive(bool isActive)
+    {
+        gunObject.SetActive(isActive);
+    }
+
+    private void SetRifleActive(bool isActive)
+    {
+        rifleObject.SetActive(isActive);
+    }
+
     private void HandleAiming()
     {
         Vector3 mousePosition = MouseUtils.GetMouseWorldPosition2D();
 
         Vector3 direction = (mousePosition - transform.position);
-        aimDirection = direction.normalized; 
+        aimDirection = direction.normalized;
         aimAngle = Mathf.Atan2(aimDirection.y, aimDirection.x) * Mathf.Rad2Deg;
         aimTransform.eulerAngles = new Vector3(0, 0, aimAngle);
 
@@ -70,12 +119,31 @@ public class PlayerAimWeapon : MonoBehaviour
 
     private void HandleShooting()
     {
-        timeBtwFire -= Time.deltaTime;
-        if (Input.GetMouseButton(0) && timeBtwFire < 0)
+        // Kiểm tra nếu người chơi nhấn chuột
+        if (Input.GetMouseButton(0))
         {
-            aimChildAnimator.SetTrigger("Shoot");
-            view.RPC("PlayShootAnimation", RpcTarget.Others);
-            FireBullet();
+            aimChildAnimator.SetTrigger("Shoot"); // Chạy animation bắn đạn
+            view.RPC("PlayShootAnimation", RpcTarget.Others); // Đồng bộ hóa animation bắn đạn với người chơi khác
+
+            // Xử lý bắn đạn cho từng loại súng
+            if (gunObject.activeSelf)
+            {
+                timeBtwFireGun -= Time.deltaTime;
+                if (timeBtwFireGun < 0)
+                {
+                    FireBullet(0); // Bắn với loại súng Gun (index 0)
+                    timeBtwFireGun = TimeBtwFireGun;
+                }
+            }
+            else if (rifleObject.activeSelf)
+            {
+                timeBtwFireRifle -= Time.deltaTime;
+                if (timeBtwFireRifle < 0)
+                {
+                    FireBullet(1); // Bắn với loại súng Rifle (index 1)
+                    timeBtwFireRifle = TimeBtwFireRifle;
+                }
+            }
         }
     }
 
@@ -93,19 +161,29 @@ public class PlayerAimWeapon : MonoBehaviour
         UpdateAiming();
     }
 
+    [PunRPC]
+    private void SyncWeaponChange(bool gunActive, bool rifleActive)
+    {
+        SetGunActive(gunActive);
+        SetRifleActive(rifleActive);
+    }
+
     private void UpdateAiming()
     {
         aimTransform.eulerAngles = new Vector3(0, 0, aimAngle);
         aimTransform.localScale = aimlocalScale;
     }
 
-    private void FireBullet()
+    private void FireBullet(int gunType)
     {
         timeBtwFire = TimeBtwFire;
 
-        GameObject bulletTmp = PhotonNetwork.Instantiate(bullet.name, firePos.position, Quaternion.Euler(0, 0, aimAngle));
+        foreach (Transform pos in firePos[gunType])
+        {
+            GameObject bulletTmp = PhotonNetwork.Instantiate(bullet.name, pos.position, Quaternion.Euler(0, 0, aimAngle));
 
-        Bullet bulletScript = bulletTmp.GetComponent<Bullet>();
-        bulletScript.bulletForce = bulletForce;
+            Bullet bulletScript = bulletTmp.GetComponent<Bullet>();
+            bulletScript.bulletForce = bulletForce;
+        }
     }
 }

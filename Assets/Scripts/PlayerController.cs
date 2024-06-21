@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        // PhotonNetwork.OfflineMode = true;
+         PhotonNetwork.OfflineMode = true;
 
         rb = GetComponent<Rigidbody2D>();
         view = GetComponent<PhotonView>();
