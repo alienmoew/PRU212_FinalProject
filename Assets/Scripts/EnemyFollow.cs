@@ -26,6 +26,7 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
     {
         waitTime = startWaitTime;
         currentSpotIndex = 0;
+
         healthSystem = new HealthSystem(maxHealth); 
 
         HealthBar healthBar = GetComponentInChildren<HealthBar>();

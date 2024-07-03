@@ -17,7 +17,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     public GameObject bullet;
     public Transform[][] firePos;
 
-    public float TimeBtwFire = 0.5f;
+    public float TimeBtwFire;
     public float bulletForce;
 
     private float timeBtwFire;
@@ -31,6 +31,9 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private float timeBtwFireGun;
     private float timeBtwFireRifle;
 
+    private HealthSystem healthSystem;
+    public int maxHealth = 100;
+
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
@@ -40,13 +43,10 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 
         firePos = new Transform[2][];
 
-        firePos[0] = new Transform[3]; // Súng bắn từ 3 vị trí
-        firePos[0][0] = transform.Find("Aim/Visual/Gun/FirePos1");
-        firePos[0][1] = transform.Find("Aim/Visual/Gun/FirePos2");
-        firePos[0][2] = transform.Find("Aim/Visual/Gun/FirePos3");
+        firePos[0] = new Transform[1]; 
+        firePos[0][0] = transform.Find("Aim/Visual/Gun/FirePos");
 
-        // Khởi tạo vị trí bắn cho Rifle
-        firePos[1] = new Transform[1]; // Súng trường bắn từ 1 vị trí
+        firePos[1] = new Transform[1];
         firePos[1][0] = transform.Find("Aim/Visual/Rifle/FirePos");
 
         aimChildAnimator = aimTransform.GetComponentInChildren<Animator>();
@@ -55,6 +55,14 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private void Start()
     {
         view = GetComponent<PhotonView>();
+
+        healthSystem = new HealthSystem(maxHealth);
+
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
+        if (healthBar != null)
+        {
+            healthBar.Setup(healthSystem);
+        }
     }
 
     private void Update()
@@ -64,18 +72,17 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
             HandleAiming();
             HandleShooting();
 
-            // Xử lý chuyển đổi súng và súng trường
             if (Input.GetKeyDown(KeyCode.Alpha1))
             {
                 SetGunActive(true);
                 SetRifleActive(false);
-                view.RPC("SyncWeaponChange", RpcTarget.Others, true, false); // Gửi RPC khi chuyển sang súng
+                view.RPC("SyncWeaponChange", RpcTarget.Others, true, false);
             }
             else if (Input.GetKeyDown(KeyCode.Alpha2))
             {
                 SetGunActive(false);
                 SetRifleActive(true);
-                view.RPC("SyncWeaponChange", RpcTarget.Others, false, true); // Gửi RPC khi chuyển sang súng trường
+                view.RPC("SyncWeaponChange", RpcTarget.Others, false, true);
             }
         }
         else
@@ -87,11 +94,25 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private void SetGunActive(bool isActive)
     {
         gunObject.SetActive(isActive);
+        if (isActive) UpdateAnimator();
     }
 
     private void SetRifleActive(bool isActive)
     {
         rifleObject.SetActive(isActive);
+        if (isActive) UpdateAnimator();
+    }
+
+    private void UpdateAnimator()
+    {
+        if (gunObject.activeSelf)
+        {
+            aimChildAnimator = gunObject.GetComponentInChildren<Animator>();
+        }
+        else if (rifleObject.activeSelf)
+        {
+            aimChildAnimator = rifleObject.GetComponentInChildren<Animator>();
+        }
     }
 
     private void HandleAiming()
@@ -119,19 +140,17 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 
     private void HandleShooting()
     {
-        // Kiểm tra nếu người chơi nhấn chuột
         if (Input.GetMouseButton(0))
         {
-            aimChildAnimator.SetTrigger("Shoot"); // Chạy animation bắn đạn
-            view.RPC("PlayShootAnimation", RpcTarget.Others); // Đồng bộ hóa animation bắn đạn với người chơi khác
+            aimChildAnimator.SetTrigger("Shoot");
+            view.RPC("PlayShootAnimation", RpcTarget.Others);
 
-            // Xử lý bắn đạn cho từng loại súng
             if (gunObject.activeSelf)
             {
                 timeBtwFireGun -= Time.deltaTime;
                 if (timeBtwFireGun < 0)
                 {
-                    FireBullet(0); // Bắn với loại súng Gun (index 0)
+                    FireBullet(0);
                     timeBtwFireGun = TimeBtwFireGun;
                 }
             }
@@ -140,7 +159,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
                 timeBtwFireRifle -= Time.deltaTime;
                 if (timeBtwFireRifle < 0)
                 {
-                    FireBullet(1); // Bắn với loại súng Rifle (index 1)
+                    FireBullet(1);
                     timeBtwFireRifle = TimeBtwFireRifle;
                 }
             }
@@ -184,6 +203,39 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 
             Bullet bulletScript = bulletTmp.GetComponent<Bullet>();
             bulletScript.bulletForce = bulletForce;
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    public void RPC_TakeDamage(int damage)
+    {
+        healthSystem.Damage(damage);
+
+        if (healthSystem.GetHealth() <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        if (photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            TakeDamage(10);
+            Destroy(other.gameObject);
         }
     }
 }
