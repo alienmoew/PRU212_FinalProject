@@ -14,7 +14,7 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
     public float followDistance = 10f;
     public float returnDistance = 15f;
 
-    public int maxHealth = 100; // Maximum health
+    public int maxHealth = 100;
 
     private GameObject currentTarget;
     private bool isFollowingPlayer;
@@ -26,9 +26,8 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
     {
         waitTime = startWaitTime;
         currentSpotIndex = 0;
-        healthSystem = new HealthSystem(maxHealth); // Initialize health system
+        healthSystem = new HealthSystem(maxHealth); 
 
-        // Set up health bar
         HealthBar healthBar = GetComponentInChildren<HealthBar>();
         if (healthBar != null)
         {
@@ -172,7 +171,6 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         }
     }
 
-    // Method to handle taking damage
     public void TakeDamage(int damage)
     {
         photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
@@ -189,7 +187,6 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         }
     }
 
-    // Method to handle enemy death
     private void Die()
     {
         if (photonView.IsMine)
@@ -198,13 +195,12 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         }
     }
 
-    // Handle collisions with bullets
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
-            TakeDamage(10); // Adjust damage value as needed
-            Destroy(other.gameObject); // Destroy the bullet on impact
+            TakeDamage(10);
+            Destroy(other.gameObject); 
         }
     }
 }

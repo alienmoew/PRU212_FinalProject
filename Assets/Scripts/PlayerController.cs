@@ -15,19 +15,24 @@ public class PlayerController : MonoBehaviourPunCallbacks
     private SpriteRenderer spriteRenderer;
     private Vector2 lastSentVelocity;
 
-    public HealthBar healthBar;
-    public HealthSystem healthSystem;
+    private HealthSystem healthSystem;
+
+    public int maxHealth = 100;
 
     void Start()
     {
-         PhotonNetwork.OfflineMode = true;
 
         rb = GetComponent<Rigidbody2D>();
         view = GetComponent<PhotonView>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        healthSystem = new HealthSystem(100);
-        healthBar.Setup(healthSystem);
+        healthSystem = new HealthSystem(maxHealth);
+
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
+        if (healthBar != null)
+        {
+            healthBar.Setup(healthSystem);
+        }
     }
 
     void Update()
@@ -89,4 +94,36 @@ public class PlayerController : MonoBehaviourPunCallbacks
         spriteRenderer.flipX = flipX;
     }
 
+    public void TakeDamage(int damage)
+    {
+        photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    public void RPC_TakeDamage(int damage)
+    {
+        healthSystem.Damage(damage);
+
+        if (healthSystem.GetHealth() <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        if (photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            TakeDamage(10);
+            Destroy(collision.gameObject);
+        }
+    }
 }
