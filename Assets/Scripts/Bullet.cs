@@ -6,6 +6,7 @@ public class Bullet : MonoBehaviourPun, IPunObservable
     public float bulletForce;
     public float destroyTime = 1f;
     private Rigidbody2D rb;
+    public PhotonView owner; // Add owner property
 
     private void Awake()
     {

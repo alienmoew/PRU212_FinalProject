@@ -15,6 +15,7 @@ public class Redzone : MonoBehaviour
     private LineRenderer lineRenderer;
     private CircleCollider2D redzoneCollider;
     private bool playerInRedzone = false;
+    private Coroutine damageCoroutine;
 
     void Start()
     {
@@ -90,11 +91,11 @@ public class Redzone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayerAimWeapon player = other.GetComponent<PlayerAimWeapon>();
-            if (player != null)
+            playerInRedzone = true;
+            if (damageCoroutine != null)
             {
-                playerInRedzone = true;
-                StopCoroutine(DealDamage(player)); // Stop coroutine if player was previously taking damage
+                StopCoroutine(damageCoroutine);
+                damageCoroutine = null;
             }
         }
     }
@@ -103,11 +104,10 @@ public class Redzone : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayerAimWeapon player = other.GetComponent<PlayerAimWeapon>();
-            if (player != null)
+            playerInRedzone = false;
+            if (damageCoroutine == null)
             {
-                playerInRedzone = false;
-                StartCoroutine(DealDamage(player)); // Start coroutine if player exits redzone
+                damageCoroutine = StartCoroutine(DealDamage(other.GetComponent<PlayerAimWeapon>()));
             }
         }
     }
@@ -116,7 +116,10 @@ public class Redzone : MonoBehaviour
     {
         while (!playerInRedzone)
         {
-            player.TakeDamage(damageAmount);
+            if (player != null)
+            {
+                player.TakeDamage(damageAmount);
+            }
             yield return new WaitForSeconds(damageRate);
         }
     }

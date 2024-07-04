@@ -22,6 +22,8 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
     private float waitTime;
     private HealthSystem healthSystem;
 
+    private PhotonView bulletOwner;
+
     private void Start()
     {
         waitTime = startWaitTime;
@@ -188,19 +190,34 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         }
     }
 
-    private void Die()
-    {
-        if (photonView.IsMine)
-        {
-            PhotonNetwork.Destroy(gameObject);
-        }
-    }
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
-            TakeDamage(10);
-            Destroy(other.gameObject);
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet != null)
+            {
+                bulletOwner = bullet.owner;
+                TakeDamage(10);
+                Destroy(other.gameObject);
+            }
+        }
+    }
+
+    private void Die()
+    {
+        if (bulletOwner != null && bulletOwner.IsMine)
+        {
+            PlayerAimWeapon playerScore = bulletOwner.GetComponent<PlayerAimWeapon>();
+            if (playerScore != null)
+            {
+                playerScore.AddScore(10);
+            }
+        }
+
+        if (photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
         }
     }
 }

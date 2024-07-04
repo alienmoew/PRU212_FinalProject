@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
 
@@ -35,6 +33,9 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private HealthSystem healthSystem;
     public int maxHealth = 100;
 
+    // Score System
+    private int score = 0;
+
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
@@ -44,7 +45,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 
         firePos = new Transform[2][];
 
-        firePos[0] = new Transform[1]; 
+        firePos[0] = new Transform[1];
         firePos[0][0] = transform.Find("Aim/Visual/Gun/FirePos");
 
         firePos[1] = new Transform[1];
@@ -64,6 +65,8 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         {
             healthBar.Setup(healthSystem);
         }
+
+        UpdateScoreText();
     }
 
     private void Update()
@@ -201,11 +204,17 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         foreach (Transform pos in firePos[gunType])
         {
             GameObject bulletTmp = PhotonNetwork.Instantiate(bullet.name, pos.position, Quaternion.Euler(0, 0, aimAngle));
-
             Bullet bulletScript = bulletTmp.GetComponent<Bullet>();
+
+            if (bulletScript != null)
+            {
+                bulletScript.owner = photonView;
+            }
+
             bulletScript.bulletForce = bulletForce;
         }
     }
+
 
     public void TakeDamage(int damage)
     {
@@ -233,7 +242,6 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         }
     }
 
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
@@ -244,6 +252,20 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         else if (other.CompareTag("Enemy"))
         {
             TakeDamage(20);
+        }
+    }
+
+    public void AddScore(int points)
+    {
+        score += points;
+        UpdateScoreText();
+    }
+
+    private void UpdateScoreText()
+    {
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateScore(score);
         }
     }
 }
