@@ -98388,8 +98388,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefabs:
   - {fileID: 5686251878950355749, guid: 69ff07c70952e724dbea25788028b4b4, type: 3}
-  - {fileID: 1910398642904028467, guid: 96b5074ae7d57bf4d94d53719f4e5d79, type: 3}
-  - {fileID: 1910398642904028467, guid: 917ab7686c0a7ef4ab14e78430fd615b, type: 3}
+  - {fileID: 5686251878950355749, guid: 24a2eb27691d6014aad58c267802003e, type: 3}
+  - {fileID: 5686251878950355749, guid: f2702ebfd906fa448a17b37c39e6913d, type: 3}
   spawnPoints:
   - {fileID: 458129734}
   - {fileID: 458129733}
