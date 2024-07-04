@@ -27,7 +27,7 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         waitTime = startWaitTime;
         currentSpotIndex = 0;
 
-        healthSystem = new HealthSystem(maxHealth); 
+        healthSystem = new HealthSystem(maxHealth);
 
         HealthBar healthBar = GetComponentInChildren<HealthBar>();
         if (healthBar != null)
@@ -195,13 +195,12 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
             PhotonNetwork.Destroy(gameObject);
         }
     }
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
             TakeDamage(10);
-            Destroy(other.gameObject); 
+            Destroy(other.gameObject);
         }
     }
 }

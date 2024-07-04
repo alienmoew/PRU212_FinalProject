@@ -580,7 +580,6 @@ MonoBehaviour:
   moveSpeed: 3
   rb: {fileID: 4175398303385305989}
   animator: {fileID: 1931536377730719045}
-  maxHealth: 100
 --- !u!114 &7307566015324594371
 MonoBehaviour:
   m_ObjectHideFlags: 0

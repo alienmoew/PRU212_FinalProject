@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using UnityEngine.SceneManagement;
 
 public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 {
@@ -227,8 +228,11 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         if (photonView.IsMine)
         {
             PhotonNetwork.Destroy(gameObject);
+            PhotonNetwork.LeaveRoom();
+            SceneManager.LoadScene("Lobby"); // Load the lobby scene upon death
         }
     }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -236,6 +240,10 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         {
             TakeDamage(10);
             Destroy(other.gameObject);
+        }
+        else if (other.CompareTag("Enemy"))
+        {
+            TakeDamage(20);
         }
     }
 }

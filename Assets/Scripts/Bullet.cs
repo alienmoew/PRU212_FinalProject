@@ -4,7 +4,7 @@ using Photon.Pun;
 public class Bullet : MonoBehaviourPun, IPunObservable
 {
     public float bulletForce;
-    public float destroyTime = 2f;
+    public float destroyTime = 1f;
     private Rigidbody2D rb;
 
     private void Awake()
@@ -18,18 +18,6 @@ public class Bullet : MonoBehaviourPun, IPunObservable
         {
             rb.AddForce(transform.right * bulletForce, ForceMode2D.Impulse);
             Invoke(nameof(DestroyBullet), destroyTime);
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (photonView.IsMine)
-        {
-            if (collision.gameObject.CompareTag("Enemy"))
-            {
-                // You could handle damage logic here if needed
-                PhotonNetwork.Destroy(gameObject);
-            }
         }
     }
 

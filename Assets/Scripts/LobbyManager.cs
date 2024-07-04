@@ -86,12 +86,28 @@ public class LobbyManager : MonoBehaviourPunCallbacks
     {
         roomPanel.SetActive(false);
         lobbyPanel.SetActive(true);
+        if (PhotonNetwork.IsConnected)
+        {
+            PhotonNetwork.LeaveRoom();
+        }
+        PhotonNetwork.LoadLevel("Lobby");
+    }
+
+    private void OnEnable()
+    {
+        PhotonNetwork.AddCallbackTarget(this);
+    }
+
+    private void OnDisable()
+    {
+        PhotonNetwork.RemoveCallbackTarget(this);
     }
 
     public override void OnConnectedToMaster()
     {
         PhotonNetwork.JoinLobby();
     }
+
 
     void UpdatePlayerList()
     {

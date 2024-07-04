@@ -9,6 +9,7 @@ public class RoomItem : MonoBehaviour
     public Text roomName;
     LobbyManager manager;
 
+    [System.Obsolete]
     public void Start()
     {
         manager = FindObjectOfType<LobbyManager>();

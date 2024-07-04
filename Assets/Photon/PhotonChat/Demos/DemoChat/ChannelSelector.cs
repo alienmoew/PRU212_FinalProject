@@ -23,6 +23,7 @@ namespace Photon.Chat.Demo
             t.text = this.Channel;
         }
 
+        [System.Obsolete]
         public void OnPointerClick(PointerEventData eventData)
         {
             ChatGui handler = FindObjectOfType<ChatGui>();

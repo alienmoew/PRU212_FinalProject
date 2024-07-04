@@ -37,9 +37,5 @@ public class CameraFollow : MonoBehaviour
                 transform.position = newCameraPosition;
             }
         }
-        else
-        {
-            Debug.LogWarning("GetCameraFollowPositionFunc is not set.");
-        }
     }
 }
