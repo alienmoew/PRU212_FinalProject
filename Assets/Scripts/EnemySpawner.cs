@@ -1,5 +1,6 @@
 using UnityEngine;
 using Photon.Pun;
+using System.Collections.Generic;
 
 public class EnemySpawner : MonoBehaviourPunCallbacks
 {
@@ -32,11 +33,29 @@ public class EnemySpawner : MonoBehaviourPunCallbacks
     {
         if (enemyPrefab != null && spawnPoints.Length > 0)
         {
-            // Choose a random spawn point
-            Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            // List to keep track of used spawn points
+            List<int> usedIndexes = new List<int>();
+
+            // Iterate until a unique spawn point is found
+            Transform spawnPoint = null;
+            do
+            {
+                // Choose a random spawn point index
+                int randomIndex = Random.Range(0, spawnPoints.Length);
+
+                // Check if this spawn point index has already been used
+                if (!usedIndexes.Contains(randomIndex))
+                {
+                    usedIndexes.Add(randomIndex); // Mark this index as used
+                    spawnPoint = spawnPoints[randomIndex]; // Get the spawn point
+                }
+
+                // Ensure we do not get stuck in an infinite loop (all points used)
+            } while (spawnPoint == null);
 
             // Instantiate the enemy prefab at the chosen spawn point
             PhotonNetwork.Instantiate(enemyPrefab.name, spawnPoint.position, spawnPoint.rotation);
         }
     }
+
 }

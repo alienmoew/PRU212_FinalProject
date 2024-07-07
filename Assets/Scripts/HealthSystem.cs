@@ -1,5 +1,6 @@
 using System;
 using Photon.Pun;
+using UnityEngine;
 
 public class HealthSystem : MonoBehaviourPunCallbacks
 {
@@ -14,6 +15,15 @@ public class HealthSystem : MonoBehaviourPunCallbacks
     }
 
     public int GetHealth() { return health; }
+
+    public int GetHealthMax() { return healthMax; }
+
+    public void SetHealthMax(int healthMax)
+    {
+        this.healthMax = healthMax;
+        if (health > healthMax) health = healthMax;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+    }
 
     public float GetHealthPercent()
     {
@@ -32,6 +42,14 @@ public class HealthSystem : MonoBehaviourPunCallbacks
     public void Heal(int healAmount)
     {
         health += healAmount;
+        if (health > healthMax) health = healthMax;
+        OnHealthChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    [PunRPC]
+    public void SetHealth(int healthAmount)
+    {
+        health = healthAmount;
         if (health > healthMax) health = healthMax;
         OnHealthChanged?.Invoke(this, EventArgs.Empty);
     }

@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using System.Collections.Generic;
-using Photon.Pun;
+﻿using Photon.Pun;
+using UnityEngine;
 
 public class EnemyFollow : MonoBehaviourPunCallbacks
 {
@@ -10,7 +9,6 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
     public float avoidanceStrength = 0.5f;
     public float patrolSpeed = 2f;
     public float startWaitTime = 3f;
-    public List<Transform> moveSpots;
     public float followDistance = 10f;
     public float returnDistance = 15f;
 
@@ -18,16 +16,18 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
 
     private GameObject currentTarget;
     private bool isFollowingPlayer;
-    private int currentSpotIndex;
+    private Vector2 spawnPosition;
     private float waitTime;
     private HealthSystem healthSystem;
 
     private PhotonView bulletOwner;
 
+    private Vector2 randomPatrolPosition;
+    private float patrolTimer;
+
     private void Start()
     {
         waitTime = startWaitTime;
-        currentSpotIndex = 0;
 
         healthSystem = new HealthSystem(maxHealth);
 
@@ -36,6 +36,9 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
         {
             healthBar.Setup(healthSystem);
         }
+
+        randomPatrolPosition = GetRandomPatrolPosition();
+        patrolTimer = Random.Range(3f, 8f);
     }
 
     private void Update()
@@ -134,33 +137,45 @@ public class EnemyFollow : MonoBehaviourPunCallbacks
 
     private void Patrol()
     {
-        if (moveSpots.Count == 0)
+        float distanceThreshold = 0.2f; 
+
+        if (Vector2.Distance(transform.position, randomPatrolPosition) < distanceThreshold)
         {
-            return;
+            patrolTimer = Random.Range(3f, 8f); 
+            randomPatrolPosition = GetRandomPatrolPosition();
         }
 
-        Transform targetSpot = moveSpots[currentSpotIndex];
+        float currentSpeed = 3f;
+        transform.position = Vector2.MoveTowards(transform.position, randomPatrolPosition, currentSpeed * Time.deltaTime);
 
-        if (Vector2.Distance(transform.position, targetSpot.position) < 0.2f)
-        {
-            if (waitTime <= 0)
-            {
-                currentSpotIndex = (currentSpotIndex + 1) % moveSpots.Count;
-                waitTime = startWaitTime;
-            }
-            else
-            {
-                waitTime -= Time.deltaTime;
-            }
-        }
-        else
-        {
-            float currentSpeed = patrolSpeed;
-            transform.position = Vector2.MoveTowards(transform.position, targetSpot.position, currentSpeed * Time.deltaTime);
-        }
+        Vector2 moveDirection = (randomPatrolPosition - (Vector2)transform.position).normalized;
+        FlipIfNeeded(moveDirection);
 
-        FlipIfNeeded(targetSpot.position - transform.position);
+        patrolTimer -= Time.deltaTime;
+        if (patrolTimer <= 0f)
+        {
+            patrolTimer = Random.Range(3f, 8f);
+            randomPatrolPosition = GetRandomPatrolPosition(); 
+        }
     }
+
+    private Vector2 GetRandomPatrolPosition()
+    {
+        float minPatrolDistance = 5f; 
+        float maxPatrolDistance = 10f; 
+
+        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        Vector2 position = (Vector2)transform.position + randomDirection * Random.Range(minPatrolDistance, maxPatrolDistance);
+
+        while (Vector2.Distance(position, (Vector2)transform.position) < minPatrolDistance)
+        {
+            randomDirection = Random.insideUnitCircle.normalized;
+            position = (Vector2)transform.position + randomDirection * Random.Range(minPatrolDistance, maxPatrolDistance);
+        }
+
+        return position;
+    }
+
 
     private void FlipIfNeeded(Vector2 moveDirection)
     {

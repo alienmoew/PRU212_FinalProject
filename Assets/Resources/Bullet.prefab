@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df60cb957a4a3f34fb5437aee8f0319f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bulletForce: 10
+  bulletForce: 5
   destroyTime: 1
   owner: {fileID: 0}
 --- !u!114 &1510446179490879574

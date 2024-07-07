@@ -12,7 +12,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private Vector3 aimlocalScale;
     private Vector3 aimDirection;
 
-    //Bullet
+    // Bullet
     public GameObject bullet;
     public Transform[][] firePos;
 
@@ -35,6 +35,12 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 
     // Score System
     private int score = 0;
+
+    // Buff thresholds
+    private bool hasReached50Points = false;
+    private bool hasReached100Points = false;
+    private bool hasReached150Points = false;
+    private bool hasReached300Points = false;
 
     private void Awake()
     {
@@ -69,24 +75,17 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         UpdateScoreText();
     }
 
-    private void Update()
+ private void Update()
     {
         if (view.IsMine)
         {
             HandleAiming();
             HandleShooting();
+            HandleWeaponSwitching();
 
-            if (Input.GetKeyDown(KeyCode.Alpha1))
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
             {
-                SetGunActive(true);
-                SetRifleActive(false);
-                view.RPC("SyncWeaponChange", RpcTarget.Others, true, false);
-            }
-            else if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                SetGunActive(false);
-                SetRifleActive(true);
-                view.RPC("SyncWeaponChange", RpcTarget.Others, false, true);
+                UIManager.Instance.ShowWinPanel();
             }
         }
         else
@@ -94,6 +93,23 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
             UpdateAiming();
         }
     }
+
+    private void HandleWeaponSwitching()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            SetGunActive(true);
+            SetRifleActive(false);
+            view.RPC("SyncWeaponChange", RpcTarget.Others, true, false);
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            SetGunActive(false);
+            SetRifleActive(true);
+            view.RPC("SyncWeaponChange", RpcTarget.Others, false, true);
+        }
+    }
+
 
     private void SetGunActive(bool isActive)
     {
@@ -215,7 +231,6 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         }
     }
 
-
     public void TakeDamage(int damage)
     {
         photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
@@ -236,28 +251,30 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
+            UIManager.Instance.ShowDeathPanel();
             PhotonNetwork.Destroy(gameObject);
-            PhotonNetwork.LeaveRoom();
-            SceneManager.LoadScene("Lobby"); // Load the lobby scene upon death
+            //SceneManager.LoadScene("Lobby"); // This can be handled from the UI panel button
         }
     }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
-            TakeDamage(10);
+            TakeDamage(5);
             Destroy(other.gameObject);
         }
         else if (other.CompareTag("Enemy"))
         {
-            TakeDamage(20);
+            TakeDamage(5);
         }
     }
 
     public void AddScore(int points)
     {
         score += points;
+        CheckScoreMilestones();
         UpdateScoreText();
     }
 
@@ -267,5 +284,67 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         {
             UIManager.Instance.UpdateScore(score);
         }
+    }
+
+    private void CheckScoreMilestones()
+    {
+        if (score >= 50 && !hasReached50Points)
+        {
+            hasReached50Points = true;
+            IncreaseHealth(50);
+        }
+        if (score >= 100 && !hasReached100Points)
+        {
+            hasReached100Points = true;
+            IncreaseFireRate(0.5f); // Reduces the fire rate by half (increase speed)
+        }
+        if (score >= 150 && !hasReached150Points)
+        {
+            hasReached150Points = true;
+            IncreaseBulletDamage(1.5f); // Increase bullet damage by 50%
+        }
+        if (score >= 300 && !hasReached300Points)
+        {
+            hasReached300Points = true;
+            IncreaseAllStats(1.1f); // Increase all stats by 10%
+        }
+    }
+
+    private void IncreaseHealth(int amount)
+    {
+        maxHealth += amount;
+        healthSystem.Heal(amount); // Heal the player by the increased amount
+
+        // Sync health across the network
+        photonView.RPC("SyncHealth", RpcTarget.All, maxHealth);
+    }
+
+
+    [PunRPC]
+    private void SyncHealth(int newMaxHealth)
+    {
+        maxHealth = newMaxHealth;
+        healthSystem.SetHealth(maxHealth);
+    }
+
+
+    private void IncreaseFireRate(float multiplier)
+    {
+        TimeBtwFireGun *= multiplier;
+        TimeBtwFireRifle *= multiplier;
+    }
+
+    private void IncreaseBulletDamage(float multiplier)
+    {
+        bulletForce *= multiplier;
+    }
+
+    private void IncreaseAllStats(float multiplier)
+    {
+        maxHealth = (int)(maxHealth * multiplier);
+        healthSystem.SetHealth(maxHealth);
+        TimeBtwFireGun *= multiplier;
+        TimeBtwFireRifle *= multiplier;
+        bulletForce *= multiplier;
     }
 }
