@@ -15,6 +15,8 @@ public class UIManager : MonoBehaviour
     public Image progressBar;  // Reference to the UI Image component
     public Sprite[] progressSprites;  // Array of sprites representing different progress stages
 
+    public TMP_Text redzoneTimerText; // Reference to the redzone timer text
+
     private int[] scoreMilestones = { 0, 50, 100, 150, 300 };  // Score milestones
 
     private void Awake()
@@ -68,6 +70,12 @@ public class UIManager : MonoBehaviour
 
         // Reset progress bar if needed
         UpdateProgressBar(0);
+
+        // Reset redzone timer text if needed
+        if (redzoneTimerText != null)
+        {
+            redzoneTimerText.text = "00:00";
+        }
     }
 
     public void UpdateScore(int score)
@@ -127,5 +135,16 @@ public class UIManager : MonoBehaviour
     public void ReturnToLobby()
     {
         SceneManager.LoadScene("ConnectToServer");
+    }
+
+    // Method to update the redzone timer text
+    public void UpdateRedzoneTimer(float timeRemaining)
+    {
+        if (redzoneTimerText != null)
+        {
+            int minutes = Mathf.FloorToInt(timeRemaining / 60F);
+            int seconds = Mathf.FloorToInt(timeRemaining % 60F);
+            redzoneTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        }
     }
 }

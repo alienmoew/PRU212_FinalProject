@@ -16,6 +16,8 @@ public class Redzone : MonoBehaviour
     private CircleCollider2D redzoneCollider;
     private bool playerInRedzone = false;
     private Coroutine damageCoroutine;
+    private float elapsedTime = 0f;
+    private float totalShrinkTime;
 
     void Start()
     {
@@ -32,7 +34,18 @@ public class Redzone : MonoBehaviour
         lineRenderer.startColor = Color.red; // Color of the line
         lineRenderer.endColor = Color.red;
 
+        totalShrinkTime = shrinkInterval1 + shrinkInterval2 * 2; // Tổng thời gian co lại
         StartCoroutine(ShrinkRedzone());
+    }
+
+    private void Update()
+    {
+        // Update the redzone timer UI every frame
+        if (UIManager.Instance != null)
+        {
+            float remainingTime = GetRemainingTime();
+            UIManager.Instance.UpdateRedzoneTimer(remainingTime);
+        }
     }
 
     private IEnumerator ShrinkRedzone()
@@ -49,19 +62,21 @@ public class Redzone : MonoBehaviour
         // Ensure radius does not go below finalRadius
         redzoneCollider.radius = finalRadius;
         DrawRedzone();
-
-        yield break;
     }
 
     private IEnumerator ShrinkToRadius(float startRadius, float shrinkInterval, float targetRadius)
     {
         float currentRadius = startRadius;
+        float shrinkTime = 0f;
 
         while (currentRadius > targetRadius)
         {
-            currentRadius -= shrinkRate * Time.deltaTime;
+            float deltaTime = Time.deltaTime;
+            currentRadius -= shrinkRate * deltaTime;
             redzoneCollider.radius = currentRadius;
             DrawRedzone();
+            elapsedTime += deltaTime;
+            shrinkTime += deltaTime;
             yield return null;
         }
 
@@ -69,7 +84,13 @@ public class Redzone : MonoBehaviour
         redzoneCollider.radius = Mathf.Max(currentRadius, targetRadius);
         DrawRedzone();
 
-        yield return new WaitForSeconds(shrinkInterval);
+        // Wait for the remaining time of the shrink interval
+        float remainingShrinkTime = shrinkInterval - shrinkTime;
+        if (remainingShrinkTime > 0)
+        {
+            yield return new WaitForSeconds(remainingShrinkTime);
+            elapsedTime += remainingShrinkTime;
+        }
     }
 
     private void DrawRedzone()
@@ -122,5 +143,10 @@ public class Redzone : MonoBehaviour
             }
             yield return new WaitForSeconds(damageRate);
         }
+    }
+
+    public float GetRemainingTime()
+    {
+        return Mathf.Max(0, totalShrinkTime - elapsedTime);
     }
 }
