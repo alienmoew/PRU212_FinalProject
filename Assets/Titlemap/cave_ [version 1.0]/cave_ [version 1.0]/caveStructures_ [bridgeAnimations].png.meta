@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      caveStructures_ [bridgeAnimations]_0: 4865018351116397702
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

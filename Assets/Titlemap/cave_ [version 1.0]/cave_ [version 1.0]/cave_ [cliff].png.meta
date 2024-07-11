@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      cave_ [cliff]_0: -7832245745079301166
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -394,7 +394,19 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      caveStructures_ [fountainPortalBridge]_0: 4189565919317284275
+      caveStructures_ [fountainPortalBridge]_1: -1289465064431795059
+      caveStructures_ [fountainPortalBridge]_10: 2953396194366417444
+      caveStructures_ [fountainPortalBridge]_11: 2845462979708889604
+      caveStructures_ [fountainPortalBridge]_2: 857129040462414624
+      caveStructures_ [fountainPortalBridge]_3: 7803339452929310322
+      caveStructures_ [fountainPortalBridge]_4: 4873747311060114426
+      caveStructures_ [fountainPortalBridge]_5: -4065689735507119124
+      caveStructures_ [fountainPortalBridge]_6: -5343672027421913912
+      caveStructures_ [fountainPortalBridge]_7: -7512447298715272246
+      caveStructures_ [fountainPortalBridge]_8: -5668523118982813317
+      caveStructures_ [fountainPortalBridge]_9: -4943038728956327706
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

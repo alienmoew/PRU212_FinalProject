@@ -658,7 +658,30 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      desert_ [fencesAndWalls]_0: -8035686733216560592
+      desert_ [fencesAndWalls]_1: -1045712643335742148
+      desert_ [fencesAndWalls]_10: -3964148775485533297
+      desert_ [fencesAndWalls]_11: 8582962263546658063
+      desert_ [fencesAndWalls]_12: -6662012829839135
+      desert_ [fencesAndWalls]_13: 1674329658904879738
+      desert_ [fencesAndWalls]_14: -8889765247218040081
+      desert_ [fencesAndWalls]_15: 5626535521273263815
+      desert_ [fencesAndWalls]_16: -6123515722393201247
+      desert_ [fencesAndWalls]_17: -5653716537616118793
+      desert_ [fencesAndWalls]_18: -5475385356071287906
+      desert_ [fencesAndWalls]_19: -1528536032498064206
+      desert_ [fencesAndWalls]_2: -8032999044601896650
+      desert_ [fencesAndWalls]_20: -3780659343362647417
+      desert_ [fencesAndWalls]_21: 8218867486549624809
+      desert_ [fencesAndWalls]_22: -3261638424248124188
+      desert_ [fencesAndWalls]_3: 7498274777540010051
+      desert_ [fencesAndWalls]_4: 6728871134575211301
+      desert_ [fencesAndWalls]_5: -6130609443700638121
+      desert_ [fencesAndWalls]_6: -7732378977479346393
+      desert_ [fencesAndWalls]_7: -1005687499613037900
+      desert_ [fencesAndWalls]_8: 1977489028291337311
+      desert_ [fencesAndWalls]_9: 9095946252751756140
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

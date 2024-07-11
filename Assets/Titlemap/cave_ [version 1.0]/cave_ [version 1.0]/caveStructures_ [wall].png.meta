@@ -418,7 +418,20 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      caveStructures_ [wall]_0: -2219243274566712816
+      caveStructures_ [wall]_1: 731394503691171522
+      caveStructures_ [wall]_10: 5786793245582516234
+      caveStructures_ [wall]_11: -433364195539131236
+      caveStructures_ [wall]_12: 4798801807881996625
+      caveStructures_ [wall]_2: -1455912113468549130
+      caveStructures_ [wall]_3: 7888020522793121569
+      caveStructures_ [wall]_4: 8804050893630374656
+      caveStructures_ [wall]_5: 5131956639585982021
+      caveStructures_ [wall]_6: -2106005229892481282
+      caveStructures_ [wall]_7: 4118681328052451445
+      caveStructures_ [wall]_8: -68237391476445868
+      caveStructures_ [wall]_9: 8496213573393838488
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

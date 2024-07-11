@@ -130,7 +130,8 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      desert_ [bridgeAnimatedTiles]_0: 2738090289102266757
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
