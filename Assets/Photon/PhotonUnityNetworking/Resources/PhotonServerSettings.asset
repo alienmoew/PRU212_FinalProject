@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: 
+  DevRegion: asia
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -40,6 +40,28 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - FlipCharacter
+  - SyncMovement
+  - PlayShootAnimation
+  - SyncAiming
+  - PlayerDied
+  - RespawnPlayer
+  - SyncHealth
+  - Damage
+  - Heal
+  - RPC_TakeDamage
+  - PlayShootAnimationRifle
+  - SyncWeaponChange
+  - UpdateRedzoneRadius
+  - PlayerEnteredRedzone
+  - SyncRedzoneState
+  - FinalizeRedzone
+  - InitializeRedzone
+  - UpdateRedzone
+  - RPC_ShrinkRedzone
+  - SetHealth
+  - DeclareWinner
+  - RPC_TakeHealth
+  - RPC_UpdateRemainingPlayersCount
   DisableAutoOpenWizard: 1
   ShowSettings: 0
-  DevRegionSetOnce: 0
+  DevRegionSetOnce: 1

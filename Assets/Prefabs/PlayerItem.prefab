@@ -60,9 +60,9 @@ MonoBehaviour:
   rightArrowButton: {fileID: 3647937112065341525}
   playerAvatar: {fileID: 9076701845721885313}
   avatars:
-  - {fileID: 21300000, guid: 4a7278c47c964e89adc78f6efc77a6c7, type: 3}
-  - {fileID: 21300000, guid: bee5b2f148c2436bb32b50e8d59b32f4, type: 3}
-  - {fileID: 21300000, guid: 51f8285e01534ff4b7232462774b9e88, type: 3}
+  - {fileID: 21300000, guid: 17cf3ba4f4b1416fba7b26ca6381077c, type: 3}
+  - {fileID: 21300000, guid: f4ee12a0f7de447ea38702acea56f26a, type: 3}
+  - {fileID: 21300000, guid: fcd1d398e73d48f9b4538e3b1079980d, type: 3}
 --- !u!222 &4170066797708904941
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -430,7 +430,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: c36c5e52693145ff966857e5c4225774, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 17cf3ba4f4b1416fba7b26ca6381077c, type: 3}
   m_Type: 0
   m_PreserveAspect: 1
   m_FillCenter: 1

@@ -5,17 +5,22 @@ TagManager:
   serializedVersion: 2
   tags:
   - Enemy
+  - Bullet
+  - Wall
+  - Platform
+  - EnemyDame
+  - Heart
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Player
+  - Wall
   - Water
   - UI
-  - Wall
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - platform
+  - bullet
   - 
   - 
   - 

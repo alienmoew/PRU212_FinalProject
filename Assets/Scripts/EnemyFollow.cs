@@ -1,43 +1,113 @@
-using Photon.Pun.Demo.PunBasics;
-using System.Collections;
-using System.Collections.Generic;
+﻿using Photon.Pun;
 using UnityEngine;
 
-public class EnemyFollow : MonoBehaviour
+public class EnemyFollow : MonoBehaviourPunCallbacks
 {
-    public float speed;
-    public float stoppingDistance;
-    public float retreatDistance;
-    public float avoidanceRadius = 1.0f;  // Radius within which enemies will avoid each other
-    public float avoidanceStrength = 0.5f;  // How strong the avoidance force should be
-    public Transform[] patrolPoints;  // Array of patrol points
-    private int currentPatrolIndex = 0;
+    public float speed = 5f;
+    public float stoppingDistance = 1f;
+    public float avoidanceRadius = 1.0f;
+    public float avoidanceStrength = 0.5f;
+    public float patrolSpeed = 2f;
+    public float startWaitTime = 3f;
+    public float followDistance = 10f;
+    public float returnDistance = 15f;
 
-    private Transform player;
+    public int maxHealth = 100;
 
-    void Start()
+    private GameObject currentTarget;
+    private bool isFollowingPlayer;
+    private Vector2 spawnPosition;
+    private float waitTime;
+    private HealthSystem healthSystem;
+
+    private PhotonView bulletOwner;
+
+    private Vector2 randomPatrolPosition;
+    private float patrolTimer;
+
+    private void Start()
     {
-        FindNearestPlayer();
+        waitTime = startWaitTime;
+
+        healthSystem = new HealthSystem(maxHealth);
+
+        HealthBar healthBar = GetComponentInChildren<HealthBar>();
+        if (healthBar != null)
+        {
+            healthBar.Setup(healthSystem);
+        }
+
+        randomPatrolPosition = GetRandomPatrolPosition();
+        patrolTimer = Random.Range(3f, 8f);
     }
 
-    void Update()
+    private void Update()
     {
-        FindNearestPlayer();
+        FindClosestPlayer();
 
-        if (player == null)
+        if (currentTarget != null)
+        {
+            float distanceToPlayer = Vector2.Distance(transform.position, currentTarget.transform.position);
+
+            if (distanceToPlayer <= followDistance)
+            {
+                isFollowingPlayer = true;
+            }
+            else if (distanceToPlayer > returnDistance)
+            {
+                isFollowingPlayer = false;
+            }
+        }
+        else
+        {
+            isFollowingPlayer = false;
+        }
+
+        if (isFollowingPlayer)
+        {
+            FollowPlayer();
+        }
+        else
         {
             Patrol();
+        }
+    }
+
+    private void FindClosestPlayer()
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        float minDistance = followDistance;
+        GameObject closestPlayer = null;
+
+        foreach (GameObject player in players)
+        {
+            float distance = Vector2.Distance(transform.position, player.transform.position);
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                closestPlayer = player;
+            }
+        }
+
+        if (closestPlayer != null)
+        {
+            currentTarget = closestPlayer;
+        }
+    }
+
+    private void FollowPlayer()
+    {
+        if (currentTarget == null)
+        {
+            isFollowingPlayer = false;
             return;
         }
 
-        Vector2 targetPosition = player.position;
+        Vector2 targetPosition = currentTarget.transform.position;
         Vector2 currentPosition = transform.position;
-
-        // Calculate the direction towards the player
         Vector2 direction = targetPosition - currentPosition;
         float distanceToPlayer = direction.magnitude;
 
-        // Apply avoidance from other enemies
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(transform.position, avoidanceRadius);
         Vector2 avoidanceForce = Vector2.zero;
 
@@ -51,64 +121,118 @@ public class EnemyFollow : MonoBehaviour
         }
 
         Vector2 moveDirection = direction.normalized;
+        float currentSpeed = speed;
 
         if (distanceToPlayer > stoppingDistance)
         {
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + moveDirection + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + moveDirection + avoidanceForce * avoidanceStrength, currentSpeed * Time.deltaTime);
         }
-        else if (distanceToPlayer < stoppingDistance && distanceToPlayer > retreatDistance)
+        else
         {
-            // Enemy stays in place, apply only avoidance force
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
+            transform.position = Vector2.MoveTowards(currentPosition, currentPosition + avoidanceForce * avoidanceStrength, currentSpeed * Time.deltaTime);
         }
-        else if (distanceToPlayer < retreatDistance)
+
+        FlipIfNeeded(moveDirection);
+    }
+
+    private void Patrol()
+    {
+        float distanceThreshold = 0.2f; 
+
+        if (Vector2.Distance(transform.position, randomPatrolPosition) < distanceThreshold)
         {
-            transform.position = Vector2.MoveTowards(currentPosition, currentPosition - moveDirection + avoidanceForce * avoidanceStrength, speed * Time.deltaTime);
+            patrolTimer = Random.Range(3f, 8f); 
+            randomPatrolPosition = GetRandomPatrolPosition();
+        }
+
+        float currentSpeed = 3f;
+        transform.position = Vector2.MoveTowards(transform.position, randomPatrolPosition, currentSpeed * Time.deltaTime);
+
+        Vector2 moveDirection = (randomPatrolPosition - (Vector2)transform.position).normalized;
+        FlipIfNeeded(moveDirection);
+
+        patrolTimer -= Time.deltaTime;
+        if (patrolTimer <= 0f)
+        {
+            patrolTimer = Random.Range(3f, 8f);
+            randomPatrolPosition = GetRandomPatrolPosition(); 
         }
     }
 
-    void Patrol()
+    private Vector2 GetRandomPatrolPosition()
     {
-        if (patrolPoints.Length == 0) return;
+        float minPatrolDistance = 5f; 
+        float maxPatrolDistance = 10f; 
 
-        Transform patrolTarget = patrolPoints[currentPatrolIndex];
-        Vector2 currentPosition = transform.position;
-        Vector2 targetPosition = patrolTarget.position;
+        Vector2 randomDirection = Random.insideUnitCircle.normalized;
+        Vector2 position = (Vector2)transform.position + randomDirection * Random.Range(minPatrolDistance, maxPatrolDistance);
 
-        // Move towards the patrol point
-        transform.position = Vector2.MoveTowards(currentPosition, targetPosition, speed * Time.deltaTime);
-
-        // Check if the enemy reached the patrol point
-        if (Vector2.Distance(currentPosition, targetPosition) < 0.1f)
+        while (Vector2.Distance(position, (Vector2)transform.position) < minPatrolDistance)
         {
-            // Move to the next patrol point
-            currentPatrolIndex = (currentPatrolIndex + 1) % patrolPoints.Length;
+            randomDirection = Random.insideUnitCircle.normalized;
+            position = (Vector2)transform.position + randomDirection * Random.Range(minPatrolDistance, maxPatrolDistance);
+        }
+
+        return position;
+    }
+
+
+    private void FlipIfNeeded(Vector2 moveDirection)
+    {
+        if (moveDirection.x > 0 && transform.localScale.x > 0)
+        {
+            transform.localScale = new Vector3(-Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
+        }
+        else if (moveDirection.x < 0 && transform.localScale.x < 0)
+        {
+            transform.localScale = new Vector3(Mathf.Abs(transform.localScale.x), transform.localScale.y, transform.localScale.z);
         }
     }
 
-    void FindNearestPlayer()
+    public void TakeDamage(int damage)
     {
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
-        float nearestDistance = Mathf.Infinity;
-        Transform nearestPlayer = null;
+        photonView.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+    }
 
-        foreach (GameObject playerObject in players)
+    [PunRPC]
+    public void RPC_TakeDamage(int damage)
+    {
+        healthSystem.Damage(damage);
+
+        if (healthSystem.GetHealth() <= 0)
         {
-            float distanceToPlayer = Vector2.Distance(transform.position, playerObject.transform.position);
-            if (distanceToPlayer < nearestDistance)
+            Die();
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Bullet"))
+        {
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet != null)
             {
-                nearestDistance = distanceToPlayer;
-                nearestPlayer = playerObject.transform;
+                bulletOwner = bullet.owner;
+                TakeDamage(10);
+                Destroy(other.gameObject);
+            }
+        }
+    }
+
+    private void Die()
+    {
+        if (bulletOwner != null && bulletOwner.IsMine)
+        {
+            PlayerAimWeapon playerScore = bulletOwner.GetComponent<PlayerAimWeapon>();
+            if (playerScore != null)
+            {
+                playerScore.AddScore(10);
             }
         }
 
-        player = nearestPlayer;
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        // Draw the avoidance radius in the editor for visualization
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, avoidanceRadius);
+        if (photonView.IsMine)
+        {
+            PhotonNetwork.Destroy(gameObject);
+        }
     }
 }

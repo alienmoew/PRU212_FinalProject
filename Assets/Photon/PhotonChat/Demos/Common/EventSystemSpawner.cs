@@ -19,6 +19,7 @@ namespace Photon.Chat.UtilityScripts
     /// </summary>
     public class EventSystemSpawner : MonoBehaviour
     {
+        [System.Obsolete]
         void OnEnable()
         {
             #if ENABLE_INPUT_SYSTEM && !ENABLE_LEGACY_INPUT_MANAGER
