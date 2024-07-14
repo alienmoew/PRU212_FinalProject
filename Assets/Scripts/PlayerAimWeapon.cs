@@ -93,6 +93,11 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         {
             UpdateAiming();
         }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            UIManager.Instance.ShowMenuPanel();
+        }
     }
 
     private void HandleWeaponSwitching()

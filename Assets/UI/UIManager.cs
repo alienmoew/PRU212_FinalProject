@@ -9,15 +9,16 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
 
     public TMP_Text scoreText;
-    public GameObject deathPanel; // Reference to the death panel GameObject
-    public GameObject winPanel;   // Reference to the win panel GameObject
+    public GameObject deathPanel; 
+    public GameObject winPanel;   
+    public GameObject menuPanel;
 
-    public Image progressBar;  // Reference to the UI Image component
-    public Sprite[] progressSprites;  // Array of sprites representing different progress stages
+    public Image progressBar;  
+    public Sprite[] progressSprites;  
 
-    public TMP_Text redzoneTimerText; // Reference to the redzone timer text
+    public TMP_Text redzoneTimerText; 
 
-    private int[] scoreMilestones = { 0, 50, 100, 150, 300 };  // Score milestones
+    private int[] scoreMilestones = { 0, 50, 100, 150, 300 }; 
 
     private void Awake()
     {
@@ -68,10 +69,8 @@ public class UIManager : MonoBehaviour
             winPanel.SetActive(false);
         }
 
-        // Reset progress bar if needed
         UpdateProgressBar(0);
 
-        // Reset redzone timer text if needed
         if (redzoneTimerText != null)
         {
             redzoneTimerText.text = "00:00";
@@ -90,7 +89,6 @@ public class UIManager : MonoBehaviour
 
     private void UpdateProgressBar(int score)
     {
-        // Determine which milestone the current score is at or above
         int milestoneIndex = 0;
         for (int i = 0; i < scoreMilestones.Length; i++)
         {
@@ -104,14 +102,12 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        // Set the sprite of the progress bar based on the milestone index
         if (milestoneIndex >= 0 && milestoneIndex < progressSprites.Length)
         {
             progressBar.sprite = progressSprites[milestoneIndex];
         }
     }
 
-    // Method to show the death panel
     public void ShowDeathPanel()
     {
         PhotonNetwork.Disconnect();
@@ -121,7 +117,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Method to show the win panel
     public void ShowWinPanel()
     {
         PhotonNetwork.Disconnect();
@@ -131,13 +126,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // Method to handle the "Return to Lobby" button click
+    public void ShowMenuPanel()
+    {
+        if(menuPanel != null)
+        {
+            menuPanel.SetActive(true);
+        }
+    }
+
     public void ReturnToLobby()
     {
         SceneManager.LoadScene("ConnectToServer");
     }
 
-    // Method to update the redzone timer text
     public void UpdateRedzoneTimer(float timeRemaining)
     {
         if (redzoneTimerText != null)
@@ -146,5 +147,28 @@ public class UIManager : MonoBehaviour
             int seconds = Mathf.FloorToInt(timeRemaining % 60F);
             redzoneTimerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         }
+    }
+
+    public void Resume()
+    {
+        if (menuPanel != null)
+        {
+            menuPanel.SetActive(false);
+        }
+    }
+
+    public void QuitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
+    public void Home()
+    {
+        PhotonNetwork.Disconnect();
+        ReturnToLobby();
     }
 }
