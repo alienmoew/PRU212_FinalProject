@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class Redzone : MonoBehaviour
 {
-    public float shrinkRate = 1f; // How fast the redzone shrinks per second
-    public float damageRate = 1f; // Time in seconds between damage ticks
-    public int damageAmount = 10; // Damage amount per tick
-    public int numSegments = 100; // Number of segments for the circle
-    public float initialRadius = 20f; // Initial radius of the redzone
-    public float shrinkInterval1 = 15f; // Interval in seconds for first shrink step
-    public float shrinkInterval2 = 10f; // Interval in seconds for second shrink step
-    public float finalRadius = 5f; // Final radius to shrink to
+    public float shrinkRate; // How fast the redzone shrinks per second
+    public float damageRate; // Time in seconds between damage ticks
+    public int damageAmount; // Damage amount per tick
+    public int numSegments; // Number of segments for the circle
+    public float initialRadius; // Initial radius of the redzone
+    public float shrinkInterval1; // Interval in seconds for first shrink step
+    public float shrinkInterval2; // Interval in seconds for second shrink step
+    public float finalRadius; // Final radius to shrink to
 
     private LineRenderer lineRenderer;
     private CircleCollider2D redzoneCollider;
@@ -34,7 +34,7 @@ public class Redzone : MonoBehaviour
         lineRenderer.startColor = Color.red; // Color of the line
         lineRenderer.endColor = Color.red;
 
-        totalShrinkTime = shrinkInterval1 + shrinkInterval2 * 2; // Tổng thời gian co lại
+        totalShrinkTime = shrinkInterval1 + shrinkInterval2 * 2;
         StartCoroutine(ShrinkRedzone());
     }
 
@@ -50,14 +50,11 @@ public class Redzone : MonoBehaviour
 
     private IEnumerator ShrinkRedzone()
     {
-        // First shrink to 15f
-        yield return ShrinkToRadius(initialRadius, shrinkInterval1, 15f);
+        yield return ShrinkToRadius(initialRadius, shrinkInterval1, 60f);
 
-        // Second shrink to 10f
-        yield return ShrinkToRadius(15f, shrinkInterval2, 10f);
+        yield return ShrinkToRadius(60f, shrinkInterval2, 30f);
 
-        // Third shrink to 5f (final radius)
-        yield return ShrinkToRadius(10f, shrinkInterval2, finalRadius);
+        yield return ShrinkToRadius(30f, shrinkInterval2, finalRadius);
 
         // Ensure radius does not go below finalRadius
         redzoneCollider.radius = finalRadius;

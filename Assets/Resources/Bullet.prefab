@@ -201,6 +201,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletForce: 5
   destroyTime: 1
+  damage: 0
   owner: {fileID: 0}
 --- !u!114 &1510446179490879574
 MonoBehaviour:

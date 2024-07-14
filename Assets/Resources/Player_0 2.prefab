@@ -598,6 +598,7 @@ MonoBehaviour:
   TimeBtwFireGun: 0.5
   TimeBtwFireRifle: 0.2
   maxHealth: 100
+  deathPrefab: {fileID: 4469726908973487223, guid: 68e4955b86fc2df4b8ca06eda8ad1c6c, type: 3}
 --- !u!114 &4953235534321571905
 MonoBehaviour:
   m_ObjectHideFlags: 0

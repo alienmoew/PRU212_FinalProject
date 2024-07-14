@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Enemy
   - Bullet
+  - Wall
+  - Platform
+  - EnemyDame
+  - Heart
   layers:
   - Default
   - TransparentFX

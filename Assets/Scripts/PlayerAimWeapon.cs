@@ -42,6 +42,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     private bool hasReached150Points = false;
     private bool hasReached300Points = false;
 
+
     private void Awake()
     {
         aimTransform = transform.Find("Aim");
@@ -162,14 +163,15 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButton(0))
         {
-            aimChildAnimator.SetTrigger("Shoot");
-            view.RPC("PlayShootAnimation", RpcTarget.Others);
+           
 
             if (gunObject.activeSelf)
             {
                 timeBtwFireGun -= Time.deltaTime;
                 if (timeBtwFireGun < 0)
                 {
+                    aimChildAnimator.SetTrigger("Shoot");
+                    view.RPC("PlayShootAnimation", RpcTarget.Others);
                     FireBullet(0);
                     timeBtwFireGun = TimeBtwFireGun;
                 }
@@ -179,6 +181,8 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
                 timeBtwFireRifle -= Time.deltaTime;
                 if (timeBtwFireRifle < 0)
                 {
+                    aimChildAnimator.SetTrigger("Shoot");
+                    view.RPC("PlayShootAnimation", RpcTarget.Others);
                     FireBullet(1);
                     timeBtwFireRifle = TimeBtwFireRifle;
                 }
@@ -225,11 +229,21 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
             if (bulletScript != null)
             {
                 bulletScript.owner = photonView;
+
+                if (gunType == 0) // Gun
+                {
+                    bulletScript.damage = 5;
+                }
+                else if (gunType == 1) // Rifle
+                {
+                    bulletScript.damage = 1;
+                }
             }
 
             bulletScript.bulletForce = bulletForce;
         }
     }
+
 
     public void TakeDamage(int damage)
     {
@@ -257,19 +271,53 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         }
     }
 
+    public void TakeHealth(int health)
+    {
+        photonView.RPC("RPC_TakeHealth", RpcTarget.All, health);
+    }
+
+    [PunRPC]
+    public void RPC_TakeHealth(int health)
+    {
+        healthSystem.Heal(health);
+    }
+
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Bullet"))
         {
-            TakeDamage(5);
+            Bullet bullet = other.GetComponent<Bullet>();
+            if (bullet != null)
+            {
+                TakeDamage(bullet.damage);
+            }
             Destroy(other.gameObject);
         }
         else if (other.CompareTag("Enemy"))
         {
             TakeDamage(5);
+            Debug.Log("enemy dame");
+        }
+
+        else if (other.CompareTag("Heart"))
+        {
+            TakeHealth(50);
+            Debug.Log("Healing");
+            Destroy(other.gameObject);
         }
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            TakeDamage(5);
+            Debug.Log("enemy dame");
+        }
+    }
+
+
 
     public void AddScore(int points)
     {

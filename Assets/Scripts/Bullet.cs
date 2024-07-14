@@ -5,8 +5,10 @@ public class Bullet : MonoBehaviourPun, IPunObservable
 {
     public float bulletForce;
     public float destroyTime = 1f;
-    private Rigidbody2D rb;
+    public int damage; // Add damage property
     public PhotonView owner; // Add owner property
+
+    private Rigidbody2D rb;
 
     private void Awake()
     {
