@@ -5,16 +5,15 @@ public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance;
     public AudioSource audioSource;
-    public AudioClip backgroundMusic1; // Music for ConnectToServer and Lobby
-    public AudioClip backgroundMusic2; // Music for Game
+    public AudioClip backgroundMusic1;
+    public AudioClip backgroundMusic2; 
 
     private void Awake()
     {
-        // Singleton pattern to ensure only one instance of AudioManager exists
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject); // Prevents this object from being destroyed when loading a new scene
+            DontDestroyOnLoad(gameObject);
         }
         else
         {
@@ -30,9 +29,8 @@ public class AudioManager : MonoBehaviour
 
     void Update()
     {
-        if (audioSource == null) // Check if audioSource is null
+        if (audioSource == null)
         {
-            Debug.LogWarning("AudioSource is null. This might be caused by the object being destroyed.");
             return;
         }
 
@@ -49,7 +47,7 @@ public class AudioManager : MonoBehaviour
 
     void PlayBackgroundMusic1()
     {
-        if (audioSource != null && audioSource.clip != backgroundMusic1) // Check if audioSource is not null
+        if (audioSource != null && audioSource.clip != backgroundMusic1)
         {
             audioSource.clip = backgroundMusic1;
             audioSource.Play();
@@ -58,9 +56,10 @@ public class AudioManager : MonoBehaviour
 
     void PlayBackgroundMusic2()
     {
-        if (audioSource != null && audioSource.clip != backgroundMusic2) // Check if audioSource is not null
+        if (audioSource != null && audioSource.clip != backgroundMusic2)
         {
             audioSource.clip = backgroundMusic2;
+            audioSource.loop = true;
             audioSource.Play();
         }
     }
