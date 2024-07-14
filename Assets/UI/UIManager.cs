@@ -18,7 +18,10 @@ public class UIManager : MonoBehaviour
 
     public TMP_Text redzoneTimerText; 
 
-    private int[] scoreMilestones = { 0, 50, 100, 150, 300 }; 
+    private int[] scoreMilestones = { 0, 50, 100, 150, 300 };
+
+    public TMP_Text remainingPlayersText;
+
 
     private void Awake()
     {
@@ -171,4 +174,13 @@ public class UIManager : MonoBehaviour
         PhotonNetwork.Disconnect();
         ReturnToLobby();
     }
+
+    public void UpdateRemainingPlayers(int remainingPlayers)
+    {
+        if (remainingPlayersText != null)
+        {
+            remainingPlayersText.text = "Alive: " + remainingPlayers;
+        }
+    }
+
 }

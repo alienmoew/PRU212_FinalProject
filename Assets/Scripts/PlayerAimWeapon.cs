@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using UnityEngine.SceneManagement;
+using Photon.Realtime;
 
 public class PlayerAimWeapon : MonoBehaviourPunCallbacks
 {
@@ -74,9 +75,35 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         }
 
         UpdateScoreText();
+        UpdateRemainingPlayersCount();
     }
 
- private void Update()
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        UpdateRemainingPlayersCount();
+    }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        UpdateRemainingPlayersCount();
+    }
+
+    private void UpdateRemainingPlayersCount()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            int remainingPlayers = PhotonNetwork.CurrentRoom.PlayerCount;
+            photonView.RPC("RPC_UpdateRemainingPlayersCount", RpcTarget.All, remainingPlayers);
+        }
+    }
+
+    [PunRPC]
+    private void RPC_UpdateRemainingPlayersCount(int remainingPlayers)
+    {
+        UIManager.Instance.UpdateRemainingPlayers(remainingPlayers);
+    }
+
+    private void Update()
     {
         if (view.IsMine)
         {
@@ -168,7 +195,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
     {
         if (Input.GetMouseButton(0))
         {
-           
+
 
             if (gunObject.activeSelf)
             {
@@ -272,6 +299,7 @@ public class PlayerAimWeapon : MonoBehaviourPunCallbacks
         {
             UIManager.Instance.ShowDeathPanel();
             PhotonNetwork.Destroy(gameObject);
+            UpdateRemainingPlayersCount();
             //SceneManager.LoadScene("Lobby"); // This can be handled from the UI panel button
         }
     }
